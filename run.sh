@@ -5,4 +5,5 @@ set -e -u -o pipefail
 docker build -t "vreid/neroka:latest" .
 docker run \
     --env-file .env \
-    "vreid/neroka:latest"
+    "vreid/neroka:latest" \
+    -h
