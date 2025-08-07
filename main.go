@@ -1,0 +1,110 @@
+package main
+
+import (
+	"context"
+	"crypto/tls"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"runtime/debug"
+	"syscall"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/gorilla/websocket"
+	"github.com/urfave/cli/v3"
+)
+
+func messageCreate(session *discordgo.Session, messageCreate *discordgo.MessageCreate) {
+	log.Printf("received message with content '%s'\n", messageCreate.Content)
+}
+
+func run(ctx context.Context, cmd *cli.Command) error {
+	botTokens := cmd.StringSlice("bot-token")
+
+	sessions := []*discordgo.Session{}
+	for _, botToken := range botTokens {
+		session, err := discordgo.New("Bot " + botToken)
+		if err != nil {
+			log.Printf("couldn't create session: %s", err.Error())
+			continue
+		}
+
+		httpTransport := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		httpClient := &http.Client{Transport: httpTransport}
+		session.Client = httpClient
+
+		dialer := websocket.DefaultDialer
+		dialer.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		session.Dialer = dialer
+
+		session.Identify.Intents = discordgo.IntentsGuildMessages
+
+		session.AddHandler(messageCreate)
+
+		err = session.Open()
+		if err != nil {
+			log.Printf("couldn't open session: %s", err.Error())
+			continue
+		}
+
+		sessions = append(sessions, session)
+	}
+
+	if len(sessions) == 0 {
+		return cli.Exit("couldn't create any sessions", 1)
+	}
+
+	log.Println("bots are running")
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+	<-sc
+
+	for _, session := range sessions {
+		session.Close()
+	}
+
+	return nil
+}
+
+func main() {
+	version := ""
+	if buildInfo, ok := debug.ReadBuildInfo(); ok {
+		cli.VersionFlag = &cli.BoolFlag{
+			Name:    "version",
+			Aliases: []string{"v"},
+		}
+
+		for _, setting := range buildInfo.Settings {
+			if setting.Key == "vcs.revision" {
+				version = setting.Value
+				break
+			}
+		}
+	}
+
+	cmd := &cli.Command{
+		Name:    "neroka",
+		Version: version,
+		Flags: []cli.Flag{
+			&cli.StringSliceFlag{
+				Name:    "bot-token",
+				Sources: cli.EnvVars("BOT_TOKEN"),
+			},
+		},
+		Commands: []*cli.Command{
+			{
+				Name:   "serve",
+				Action: run,
+			},
+		},
+		DefaultCommand: "serve",
+	}
+
+	ctx := context.Background()
+	if err := cmd.Run(ctx, os.Args); err != nil {
+		log.Fatal(err)
+	}
+}
