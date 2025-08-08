@@ -7,10 +7,15 @@ import (
 
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
-	"github.com/openai/openai-go/packages/param"
-	"github.com/samber/lo"
+	"github.com/urfave/cli/v3"
 	"github.com/vreid/neroka/internal/common"
 )
+
+const name = "openai"
+
+func init() {
+	common.Providers[name] = NewProvider
+}
 
 type openaiProvider struct {
 	common.BaseProvider
@@ -18,52 +23,10 @@ type openaiProvider struct {
 	client *openai.Client
 }
 
-func (p *openaiProvider) Response(messages []string, opt *common.ResponseOptions) (string, error) {
-	model := opt.Model
-	if len(model) == 0 {
-		model = p.DefaultModel
-	}
-
-	mappedMessages := lo.Map(messages, func(message string, _ int) openai.ChatCompletionMessageParamUnion {
-		return openai.UserMessage(message)
-	})
-
-	response, err := p.client.Chat.Completions.New(opt.Context, openai.ChatCompletionNewParams{
-		Messages:  mappedMessages,
-		Model:     model,
-		MaxTokens: param.NewOpt(opt.MaxTokens),
-	})
-	if err != nil {
-		return "", err
-	}
-
-	return response.Choices[0].Message.Content, nil
-}
-
-func (p *openaiProvider) loadAndUpdateModels(ctx context.Context) error {
-	log.Println("started loading models for OpenAI provider")
-
-	client := p.client
-
-	res, err := client.Models.List(ctx)
-	if err != nil {
-		return err
-	}
-
-	for page := res; page != nil && err == nil; page, err = res.GetNextPage() {
-		for _, model := range res.Data {
-			p.AvailableModels[model.ID] = true
-		}
-	}
-
-	log.Printf("loaded %d models\n", len(p.AvailableModels))
-
-	return nil
-}
-
-func NewProvider(ctx context.Context, apiKey string) (common.AIProvider, error) {
+func NewProvider(ctx context.Context, cmd *cli.Command) (common.AIProvider, error) {
+	apiKey := cmd.String(fmt.Sprintf("%s-api-key", name))
 	if len(apiKey) == 0 {
-		return nil, fmt.Errorf("no OpenAI API key provided")
+		return nil, fmt.Errorf("no API key provided for '%s'", name)
 	}
 
 	client := openai.NewClient(
@@ -83,4 +46,25 @@ func NewProvider(ctx context.Context, apiKey string) (common.AIProvider, error) 
 	_ = result.CheckDefaultModel()
 
 	return result, nil
+}
+
+func (p *openaiProvider) loadAndUpdateModels(ctx context.Context) error {
+	log.Printf("started loading models for provider '%s'\n", name)
+
+	client := p.client
+
+	res, err := client.Models.List(ctx)
+	if err != nil {
+		return err
+	}
+
+	for page := res; page != nil && err == nil; page, err = res.GetNextPage() {
+		for _, model := range res.Data {
+			p.AvailableModels[model.ID] = true
+		}
+	}
+
+	log.Printf("loaded %d models\n", len(p.AvailableModels))
+
+	return nil
 }
