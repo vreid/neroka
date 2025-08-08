@@ -10,7 +10,7 @@ import (
 
 	"github.com/urfave/cli/v3"
 	"github.com/vreid/neroka/internal/common"
-	"github.com/vreid/neroka/internal/serve"
+	"github.com/vreid/neroka/internal/core"
 
 	_ "github.com/vreid/neroka/internal/anthropic"
 	_ "github.com/vreid/neroka/internal/openai"
@@ -69,7 +69,7 @@ func main() {
 	commands := []*cli.Command{
 		{
 			Name:   "serve",
-			Action: serve.Run,
+			Action: core.Run,
 		},
 	}
 

@@ -1,15 +1,14 @@
 package memory
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 	"slices"
 	"strings"
 	"time"
 
 	"github.com/samber/lo"
 	"github.com/spf13/afero"
+	"github.com/vreid/neroka/internal/common"
 )
 
 type filesystemMemoryManager struct {
@@ -19,51 +18,22 @@ type filesystemMemoryManager struct {
 }
 
 func NewFilesystemMemoryManager(fs afero.Fs, filename string) (MemoryManager, error) {
-	memories := map[int64][]MemoryEntry{}
-	result := &filesystemMemoryManager{
-		fs,
-		filename,
-		memories,
-	}
-
-	err := result.loadData()
+	memories, err := common.LoadData[map[int64][]MemoryEntry](fs, filename)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't load memory data: %s", err.Error())
 	}
 
+	if memories == nil {
+		memories = &map[int64][]MemoryEntry{}
+	}
+
+	result := &filesystemMemoryManager{
+		fs,
+		filename,
+		*memories,
+	}
+
 	return result, nil
-}
-
-func (m *filesystemMemoryManager) saveData() error {
-	data, err := json.MarshalIndent(m.memories, "", "  ")
-	if err != nil {
-		return fmt.Errorf("couldn't marshal memories: %s", err.Error())
-	}
-
-	err = afero.WriteFile(m.fs, m.filename, data, 0644)
-	if err != nil {
-		return fmt.Errorf("couldn't write memory file: %s", err.Error())
-	}
-
-	return nil
-}
-
-func (m *filesystemMemoryManager) loadData() error {
-	if _, err := m.fs.Stat(m.filename); os.IsNotExist(err) {
-		return nil
-	}
-
-	data, err := afero.ReadFile(m.fs, m.filename)
-	if err != nil {
-		return fmt.Errorf("couldn't read memory file: %s", err.Error())
-	}
-
-	err = json.Unmarshal(data, &m.memories)
-	if err != nil {
-		return fmt.Errorf("couldn't unmarshal memories: %s", err.Error())
-	}
-
-	return nil
 }
 
 func (m *filesystemMemoryManager) SaveMemory(id int64, memoryText string, keywords []string) (int, error) {
@@ -85,7 +55,7 @@ func (m *filesystemMemoryManager) SaveMemory(id int64, memoryText string, keywor
 		Timestamp: time.Now().UTC(),
 	})
 
-	err := m.saveData()
+	err := common.SaveData(m.fs, m.filename, &m.memories)
 	if err != nil {
 		return 0, err
 	}
@@ -127,7 +97,7 @@ func (m *filesystemMemoryManager) GetAllMemories(id int64) []MemoryEntry {
 func (m *filesystemMemoryManager) DeleteAllMemories(id int64) error {
 	delete(m.memories, id)
 
-	return m.saveData()
+	return common.SaveData(m.fs, m.filename, &m.memories)
 }
 
 func (m *filesystemMemoryManager) EditMemory(id int64, memoryIndex int, memoryText string) (bool, error) {
@@ -152,7 +122,7 @@ func (m *filesystemMemoryManager) EditMemory(id int64, memoryIndex int, memoryTe
 		Timestamp: time.Now().UTC(),
 	}
 
-	err := m.saveData()
+	err := common.SaveData(m.fs, m.filename, &m.memories)
 	if err != nil {
 		return false, err
 	}
@@ -168,7 +138,7 @@ func (m *filesystemMemoryManager) DeleteMemory(id int64, memoryIndex int) (bool,
 
 	m.memories[id] = append(m.memories[id][:memoryIndex], m.memories[id][memoryIndex+1:]...)
 
-	err := m.saveData()
+	err := common.SaveData(m.fs, m.filename, &m.memories)
 	if err != nil {
 		return false, err
 	}
