@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/urfave/cli/v3"
-	"github.com/vreid/neroka/internal/common"
+	"github.com/vreid/neroka/internal/providers/common"
 )
 
 const (

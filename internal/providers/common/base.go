@@ -7,6 +7,7 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/urfave/cli/v3"
+	"github.com/vreid/neroka/internal/common"
 	"resty.dev/v3"
 )
 
@@ -24,7 +25,7 @@ type BaseProvider struct {
 }
 
 func NewBaseProvider(baseUrl, defaultModel string) BaseProvider {
-	client := resty.NewWithClient(NewHttpClient())
+	client := resty.NewWithClient(common.NewHttpClient())
 
 	client.SetBaseURL(baseUrl)
 

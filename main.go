@@ -9,12 +9,12 @@ import (
 	"strings"
 
 	"github.com/urfave/cli/v3"
-	"github.com/vreid/neroka/internal/common"
 	"github.com/vreid/neroka/internal/core"
+	"github.com/vreid/neroka/internal/providers/common"
 
-	_ "github.com/vreid/neroka/internal/anthropic"
-	_ "github.com/vreid/neroka/internal/openai"
-	_ "github.com/vreid/neroka/internal/openrouter"
+	_ "github.com/vreid/neroka/internal/providers/anthropic"
+	_ "github.com/vreid/neroka/internal/providers/openai"
+	_ "github.com/vreid/neroka/internal/providers/openrouter"
 )
 
 func testProvider(ctx context.Context, cmd *cli.Command) error {
