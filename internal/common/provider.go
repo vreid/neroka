@@ -2,45 +2,45 @@ package common
 
 import (
 	"context"
+	"io"
 	"log"
 
 	"github.com/samber/lo"
 	"github.com/urfave/cli/v3"
+	"resty.dev/v3"
 )
 
 var (
 	Providers map[string]NewProviderFunc = map[string]NewProviderFunc{}
 )
 
-type ResponseOptions struct {
-	Context      context.Context
-	SystemPrompt string
-	Temperature  float64
-	Model        string
-	MaxTokens    int64
+type BaseProvider struct {
+	io.Closer
+
+	Client *resty.Client
+
+	DefaultModel    string
+	AvailableModels map[string]bool
 }
 
-func NewResponseOptions() *ResponseOptions {
-	return &ResponseOptions{
-		Context:      context.TODO(),
-		SystemPrompt: "You are a helpful assistant.",
-		Temperature:  1.0,
-		Model:        "",
-		MaxTokens:    2048,
+func NewBaseProvider(baseUrl, defaultModel string) BaseProvider {
+	client := resty.NewWithClient(NewHttpClient())
+
+	client.SetBaseURL(baseUrl)
+
+	return BaseProvider{
+		Client:          client,
+		DefaultModel:    defaultModel,
+		AvailableModels: map[string]bool{},
 	}
 }
 
-type AIProvider interface {
-	AvaiableModels() []string
+func (p *BaseProvider) Close() error {
+	if p.Client == nil {
+		return nil
+	}
 
-	Response(messages []string, opt *ResponseOptions) (string, error)
-}
-
-type NewProviderFunc func(ctx context.Context, cmd *cli.Command) (AIProvider, error)
-
-type BaseProvider struct {
-	AvailableModels map[string]bool
-	DefaultModel    string
+	return p.Client.Close()
 }
 
 func (p *BaseProvider) AvaiableModels() []string {
@@ -55,3 +55,14 @@ func (p *BaseProvider) CheckDefaultModel() bool {
 
 	return true
 }
+
+type Message struct {
+	Role string `json:"role"`
+	Text string `json:"text"`
+}
+
+type ChatProvider interface {
+	Response(messages ...Message) (string, error)
+}
+
+type NewProviderFunc func(ctx context.Context, cmd *cli.Command) (ChatProvider, error)

@@ -33,7 +33,7 @@ func testProvider(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("couldn't create provider '%s': %s", providerName, err.Error())
 	}
 
-	response, err := provider.Response([]string{"Say 'this is a test'."}, common.NewResponseOptions())
+	response, err := provider.Response(common.Message{Role: "user", Text: "Say 'this is a test'."})
 	if err != nil {
 		return fmt.Errorf("couldn't create test response for '%s': %s", providerName, err.Error())
 	}
