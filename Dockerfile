@@ -21,6 +21,13 @@ FROM oven/bun:1-alpine
 
 WORKDIR /app
 
+COPY bun.lock .
+COPY package.json .
+
+RUN bun install \
+    --production \
+    --frozen-lockfile
+
 COPY --from=build /build/neroka.js .
 
 ENTRYPOINT [ "bun", "run", "/app/neroka.js" ]
