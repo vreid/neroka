@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neroka
+  labels:
+    app: neroka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neroka
+  template:
+    metadata:
+      labels:
+        app: neroka
+    spec:
+      containers:
+        - name: neroka
+          image: vreid/neroka
+          imagePullPolicy: Always
+          env:
+            - name: MASTODON_SERVER
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: mastodon_server
+            - name: MASTODON_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: mastodon_access_token
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: anthropic_api_key
+            - name: ANTHROPIC_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: anthropic_base_url
+            - name: DEEPSEEK_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: deepseek_api_key
+            - name: DEEPSEEK_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: deepseek_base_url
+            - name: MISTRAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: mistral_api_key
+            - name: MISTRAL_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: mistral_base_url
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: openrouter_api_key
+            - name: OPENROUTER_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: neroka-secrets
+                  key: openrouter_base_url
