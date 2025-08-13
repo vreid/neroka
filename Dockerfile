@@ -1,4 +1,4 @@
-FROM oven/bun:1-alpine AS build
+FROM oven/bun:1-debian AS build
 
 WORKDIR /build
 
@@ -17,12 +17,16 @@ RUN bun build \
     --outfile=neroka.js \
     src/index.ts
 
-FROM oven/bun:1-alpine
+FROM oven/bun:1-debian
 
 WORKDIR /app
 
 COPY bun.lock .
 COPY package.json .
+
+RUN apt-get update &&\
+    apt-get install -y \
+    ca-certificates
 
 RUN bun install \
     --production \
