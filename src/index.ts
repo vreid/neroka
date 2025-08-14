@@ -2,20 +2,12 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 import { createMistral } from "@ai-sdk/mistral";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import {
-  generateText,
-  type AssistantModelMessage,
-  type LanguageModel,
-  type UserModelMessage,
-} from "ai";
-import { convert } from "html-to-text";
+import { generateText, type LanguageModel } from "ai";
 import { createRestAPIClient, createStreamingAPIClient } from "masto";
-import type { MediaAttachment } from "masto/mastodon/entities/v1/media-attachment.js";
 import moment from "moment";
-import { EOL } from "node:os";
-import sharp from "sharp";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import { convertToMessages, textContent } from "./util";
 
 import neroka from "./neroka.txt" with { type: "text" };
 import systemPrompt from "./system_prompt.txt" with { type: "text" };
@@ -111,52 +103,7 @@ const streamingClient = createStreamingAPIClient({
 
 const credentials = await restClient.v1.accounts.verifyCredentials();
 
-function textContent(content: string): string {
-  return convert(content, {
-    wordwrap: false,
-    selectors: [{ selector: "a", format: "skip" }],
-  });
-}
-
-async function describeAttachment(mediaAttachment: MediaAttachment) {
-  if (mediaAttachment.type != "image" || mediaAttachment.url == null) {
-    return "";
-  }
-
-  console.log(`describing ${mediaAttachment.id}`);
-
-  const response = await fetch(mediaAttachment.url);
-  const buffer = await sharp(await response.arrayBuffer())
-    .resize(1000)
-    .webp()
-    .toBuffer();
-
-  const { text } = await generateText({
-    model: mistral("pixtral-12b-latest"),
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: "Describe the image.",
-          },
-          {
-            type: "image",
-            image: buffer,
-          },
-        ],
-      },
-    ],
-  });
-
-  console.log(
-    `description is ${text.substring(0, Math.min(100, text.length))}`
-  );
-  return text;
-}
-
-console.log("waiting for events");
+console.log("waiting for direct messages");
 for await (const event of streamingClient.direct.subscribe()) {
   console.log(`received ${event.event}`);
   if (event.event != "conversation") {
@@ -165,25 +112,26 @@ for await (const event of streamingClient.direct.subscribe()) {
 
   const lastStatus = event.payload.lastStatus;
   if (!lastStatus) {
-    console.log("lastStatus was null");
+    console.log("last status is null");
     continue;
   }
 
   const statusId = lastStatus.id;
-  console.log(`id is ${statusId}`);
+  console.log(`status id is ${statusId}`);
 
   const status = await restClient.v1.statuses.$select(statusId).fetch();
+  console.log("fetched status");
+
   if (status.account.username == credentials.username) {
-    console.log("last post is from myself");
+    console.log(`last post is from ${credentials.username}`);
     continue;
   }
 
   const statusContext = await restClient.v1.statuses
     .$select(statusId)
     .context.fetch();
-
   console.log(
-    `context has ${statusContext.ancestors.length} ancestors and ${statusContext.descendants.length} descendants`
+    `fetched context (${statusContext.ancestors.length} ancestors, ${statusContext.descendants.length} descendants)`
   );
 
   const currentConversation = [
@@ -192,44 +140,10 @@ for await (const event of streamingClient.direct.subscribe()) {
     ...statusContext.descendants,
   ];
 
-  const userMessages = await Promise.all(
-    currentConversation.map(async (entry) => {
-      const username = entry.account.username;
-
-      const createdAt = moment(entry.createdAt).format(
-        "MMMM Do YYYY, h:mm:ss a"
-      );
-
-      const imageDescriptions = (
-        await Promise.all(
-          entry.mediaAttachments.map(
-            async (mediaAttachment) => await describeAttachment(mediaAttachment)
-          )
-        )
-      )
-        .filter((x) => x && x.length > 0)
-        .join(EOL);
-
-      const content = (() => {
-        if (imageDescriptions.length == 0) {
-          return `${textContent(entry.content)}`;
-        }
-
-        return [`${textContent(entry.content)}`, imageDescriptions].join(EOL);
-      })();
-
-      if (username == credentials.username) {
-        return {
-          role: "assistant",
-          content,
-        } as AssistantModelMessage;
-      }
-
-      return {
-        role: "user",
-        content: `${username} on ${createdAt}: ${content}`,
-      } as UserModelMessage;
-    })
+  const userMessages = await convertToMessages(
+    mistral("pixtral-12b-latest"),
+    currentConversation,
+    credentials.username
   );
 
   const model: LanguageModel = (() => {
@@ -243,8 +157,6 @@ for await (const event of streamingClient.direct.subscribe()) {
 
     return models[Math.floor(Math.random() * models.length)]!;
   })();
-
-  console.log(`using ${model.modelId}`);
 
   const { text } = await generateText({
     model,
@@ -264,6 +176,7 @@ for await (const event of streamingClient.direct.subscribe()) {
       ...userMessages,
     ],
   });
+  console.log(`finished text generation using ${model.modelId}`);
 
   const reply = await restClient.v1.statuses.create({
     inReplyToId: status.id,
@@ -273,6 +186,6 @@ for await (const event of streamingClient.direct.subscribe()) {
 
   const replyContent = textContent(reply.content);
   console.log(
-    `reply is ${replyContent.substring(0, Math.min(100, replyContent.length))}`
+    `reply content is ${replyContent.substring(0, Math.min(100, replyContent.length))}`
   );
 }
