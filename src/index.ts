@@ -17,8 +17,8 @@ import sharp from "sharp";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-// @ts-ignore
-import neroka from "./neroka.md" with { type: "text" };
+import neroka from "./neroka.txt" with { type: "text" };
+import systemPrompt from "./system_prompt.txt" with { type: "text" };
 
 const args = yargs(hideBin(process.argv))
   .help("help")
@@ -92,7 +92,7 @@ const mistral = createMistral({
   apiKey: args.mistralApiKey,
 });
 
-const openaiCompatible = createOpenAICompatible({
+const openrouter = createOpenAICompatible({
   name: "openrouter",
   baseURL: args.openrouterBaseUrl || "https://openrouter.ai/api/v1",
   apiKey: args.openrouterApiKey,
@@ -236,7 +236,9 @@ for await (const event of streamingClient.direct.subscribe()) {
     const models = [
       anthropic("claude-3-5-haiku-20241022"),
       deepSeek("deepseek-chat"),
-      openaiCompatible("google/gemini-2.5-pro"),
+      mistral("mistral-medium-latest"),
+      openrouter("google/gemini-2.5-pro"),
+      openrouter("moonshotai/kimi-k2"),
     ];
 
     return models[Math.floor(Math.random() * models.length)]!;
@@ -247,6 +249,10 @@ for await (const event of streamingClient.direct.subscribe()) {
   const { text } = await generateText({
     model,
     messages: [
+      {
+        role: "system",
+        content: systemPrompt,
+      },
       {
         role: "system",
         content: neroka,
