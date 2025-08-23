@@ -11,11 +11,7 @@ RUN bun install \
 COPY tsconfig.json .
 COPY src/ src/
 
-RUN bun build \
-    --target=bun \
-    --production \
-    --outfile=neroka.js \
-    src/index.ts
+RUN bun run build
 
 FROM oven/bun:1-debian
 

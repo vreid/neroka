@@ -3,20 +3,23 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "build": "bun build --target=bun --production --outfile=neroka.js src/index.ts"
+  },
   "devDependencies": {
     "@types/bun": "^1.2.20",
     "prettier": "^3.6.2",
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^2.0.2",
-    "@ai-sdk/deepseek": "^1.0.6",
-    "@ai-sdk/mistral": "^2.0.3",
-    "@ai-sdk/openai": "^2.0.11",
+    "@ai-sdk/anthropic": "^2.0.6",
+    "@ai-sdk/deepseek": "^1.0.11",
+    "@ai-sdk/mistral": "^2.0.9",
+    "@ai-sdk/openai": "^2.0.19",
     "@types/html-to-text": "^9.0.4",
     "@types/sharp": "^0.32.0",
     "@types/yargs": "^17.0.33",
-    "ai": "^5.0.11",
+    "ai": "^5.0.22",
     "html-to-text": "^9.0.5",
     "masto": "^7.2.0",
     "moment": "^2.30.1",

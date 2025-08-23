@@ -6,13 +6,12 @@ import { generateText, type LanguageModel } from "ai";
 import { createRestAPIClient, createStreamingAPIClient } from "masto";
 import moment from "moment";
 import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
 import { convertToMessages, textContent } from "./util";
 
 import neroka from "./neroka.txt" with { type: "text" };
 import systemPrompt from "./system_prompt.txt" with { type: "text" };
 
-const args = yargs(hideBin(process.argv))
+const args = yargs(process.argv)
   .help("help")
   .alias("h", "help")
   .version("version", "xyz")
@@ -104,7 +103,7 @@ const streamingClient = createStreamingAPIClient({
 const credentials = await restClient.v1.accounts.verifyCredentials();
 
 console.log("waiting for direct messages");
-for await (const event of streamingClient.direct.subscribe()) {
+for await (const event of streamingClient.public.subscribe()) {
   console.log(`received ${event.event}`);
   if (event.event != "conversation") {
     continue;

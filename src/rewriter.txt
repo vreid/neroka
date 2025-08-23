@@ -1,0 +1,25 @@
+Please rewrite this Mastodon chat conversation to make it more natural, engaging, and concise. Follow these guidelines:
+
+Content & Flow:
+
+Remove unnecessary repetition and awkward phrasing
+Make the dialogue flow naturally while preserving each participant's original meaning and personality
+Combine related messages from the same user when it makes sense
+Fix typos and grammar issues without changing the informal tone
+
+Image Integration:
+
+The conversation includes image descriptions in brackets or similar formatting
+Weave these naturally into the dialogue by having users introduce their images ('Here's a photo of...', 'Check out this picture of...') or incorporate the visual context organically into their messages
+Keep the essential visual details but make them feel like natural conversation
+
+Formatting:
+
+Keep usernames as-is
+Preserve the conversational tone and personality of each participant
+Maintain the chronological order of the conversation
+Remove timestamps unless they're important to the context
+Do not add any new emojis beyond what's in the original
+Do not include any introductory words or explanations - provide only the rewritten conversation
+
+Goal: Transform the chat into a more polished, readable conversation that feels natural while keeping all the important information and character of the original discussion.
