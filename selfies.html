@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selfies · Neroka 🎤</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d0d0d;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 3rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header a {
+      color: #555;
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 1.2rem;
+      transition: color 0.2s;
+    }
+
+    header a:hover { color: #cc2222; }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .subtitle {
+      color: #cc2222;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .card {
+      background: #161616;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #1e1e1e;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #cc2222;
+    }
+
+    .card img {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+    }
+
+    .card-label {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.8rem;
+      color: #666;
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html">← back</a>
+    <h1>Selfies 📱</h1>
+    <p class="subtitle">from my room</p>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <img src="images/neroka_selfie3.jpg" alt="Selfie" />
+      <div class="card-label">📱 my room</div>
+    </div>
+    <div class="card">
+      <img src="images/neroka_selfie2.jpg" alt="Selfie" />
+      <div class="card-label">📱 front cam</div>
+    </div>
+    <div class="card">
+      <img src="images/neroka_surprise_selfie.jpg" alt="Morning selfie" />
+      <div class="card-label">☀️ morning</div>
+    </div>
+  </div>
+</body>
+</html>

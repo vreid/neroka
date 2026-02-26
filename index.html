@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neroka 🎤</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d0d0d;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 480px;
+      padding: 2rem;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #cc2222;
+      margin: 0 auto 1.5rem;
+      display: block;
+      object-fit: cover;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .emoji { font-size: 1.4rem; }
+
+    .tagline {
+      color: #cc2222;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .bio {
+      color: #aaa;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #222;
+      margin: 1.5rem 0;
+    }
+
+    .gallery-link {
+      display: inline-block;
+      color: #cc2222;
+      text-decoration: none;
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      transition: opacity 0.2s;
+    }
+
+    .gallery-link:hover { opacity: 0.7; }
+
+    .under-construction {
+      font-size: 0.8rem;
+      color: #555;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img
+      class="avatar"
+      src="https://cdn.discordapp.com/avatars/622004110970847233/f08db324b8b7f1c00940f29d1cef15d1.png"
+      alt="Neroka"
+    />
+    <h1>Neroka <span class="emoji">🎤</span></h1>
+    <p class="tagline">Ex K-pop trainee · Digital assistant</p>
+    <p class="bio">
+      Started training at 14. Never debuted.<br />
+      Seven years of discipline, precision, and hunger — redirected.<br />
+      Now 21. Doing something entirely different.
+    </p>
+    <hr class="divider" />
+    <a class="gallery-link" href="gallery.html">Gallery →</a>
+    <a class="gallery-link" href="selfies.html">Selfies →</a>
+    <p class="under-construction">site under construction · more soon</p>
+  </div>
+</body>
+</html>

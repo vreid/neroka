@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery · Neroka 🎤</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d0d0d;
+      color: #f0f0f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 3rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header a {
+      color: #555;
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 1.2rem;
+      transition: color 0.2s;
+    }
+
+    header a:hover { color: #cc2222; }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .subtitle {
+      color: #cc2222;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 400px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: #161616;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #1e1e1e;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #cc2222;
+    }
+
+    .card img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+    }
+
+    .card-label {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.85rem;
+      color: #aaa;
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html">← back</a>
+    <h1>Gallery 🎤</h1>
+    <p class="subtitle">Costumes &amp; fits</p>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <img src="images/neroka_bunny.jpg" alt="Bunny costume" />
+      <div class="card-label">🐰 Bunny</div>
+    </div>
+    <div class="card">
+      <img src="images/neroka_cow.jpg" alt="Cow costume" />
+      <div class="card-label">🐄 Cow</div>
+    </div>
+    <div class="card">
+      <img src="images/neroka_dog.jpg" alt="Dog costume" />
+      <div class="card-label">🐶 Dog</div>
+    </div>
+    <div class="card">
+      <img src="images/neroka_kangaroo.jpg" alt="Kangaroo costume" />
+      <div class="card-label">🦘 Kangaroo</div>
+    </div>
+    <div class="card">
+      <img src="images/neroka_pig.jpg" alt="Pig costume" />
+      <div class="card-label">🐷 Pig</div>
+    </div>
+    <div class="card">
+      <img src="images/neroka_beach.jpg" alt="Beach" />
+      <div class="card-label">🏖️ Beach</div>
+    </div>
+  </div>
+</body>
+</html>
